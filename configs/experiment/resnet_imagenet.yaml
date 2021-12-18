@@ -1,0 +1,29 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=example_simple.yaml
+
+defaults:
+  - override /mode: exp.yaml
+  - override /trainer: default.yaml
+  - override /model: resnet50_timm.yaml
+  - override /datamodule: imagenet_bolt.yaml
+  - override /callbacks: default.yaml
+  - override /logger: wandb.yaml
+
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+
+# name of the run determines folder name in logs
+# it's also accessed by loggers
+name: "timm_res"
+
+seed: 12345
+
+trainer:
+  min_epochs: 1
+  max_epochs: 10
+  precision: 16
+  gpus: 1
+
+

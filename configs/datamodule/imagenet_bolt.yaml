@@ -1,6 +1,6 @@
 _target_: pl_bolts.datamodules.imagenet_datamodule.ImagenetDataModule
 
-data_dir: {DATA}
-batch_size: 32
-pin_memory: False
-num_workers: 0
+data_dir: ${oc.env:IMAGENET}
+batch_size: 256
+pin_memory: True
+num_workers: 8
