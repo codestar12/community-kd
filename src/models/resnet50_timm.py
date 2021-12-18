@@ -19,7 +19,7 @@ class ResNet(LightningModule):
         super().__init__()
 
         self.save_hyperparameters(logger=False)
-        
+
         self.model = timm.create_model('resnet34')
         self.criterion = torch.nn.CrossEntropyLoss()
 
@@ -63,11 +63,6 @@ class ResNet(LightningModule):
         self.log("val/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
 
         return {"loss": loss, "preds": preds, "targets": targets}
-
-    def validation_epoch_end(self, outputs: List[Any]):
-        acc = self.val_acc.compute()  # get val accuracy from current epoch
-        self.val_acc_best.update(acc)
-        self.log("val/acc_best", self.val_acc_best.compute(), on_epoch=True, prog_bar=True)
 
     def test_step(self, batch: Any, batch_idx: int):
         loss, preds, targets = self.step(batch)

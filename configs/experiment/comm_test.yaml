@@ -6,7 +6,7 @@
 defaults:
   - override /mode: exp.yaml
   - override /trainer: default.yaml
-  - override /model: resnet50_timm.yaml
+  - override /model: timm_com.yaml
   - override /datamodule: imagenet_bolt.yaml
   - override /callbacks: default.yaml
   - override /logger: wandb.yaml
@@ -30,5 +30,8 @@ trainer:
     - 1
     - 2
     - 3
+
+datamodule:
+  batch_size: 128
 
 
