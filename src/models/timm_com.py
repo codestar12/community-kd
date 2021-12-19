@@ -123,6 +123,10 @@ class CommKD(LightningModule):
             if i == 0:
                 self.log("teacher/val/loss", losses[i], on_step=False, on_epoch=True, prog_bar=False)
                 self.log("teacher/val/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
+            else:
+                self.log(f"student_{i}/val/loss", losses[i], on_step=False, on_epoch=True, prog_bar=False)
+                self.log(f"student_{i}/val/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
+
         
         loss = sum(losses)
 
@@ -139,6 +143,9 @@ class CommKD(LightningModule):
             if i == 0:
                 self.log("teacher/test/loss", losses[i], on_step=False, on_epoch=True, prog_bar=False)
                 self.log("teacher/test/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
+            else:
+                self.log(f"student_{i}/test/loss", losses[i], on_step=False, on_epoch=True, prog_bar=False)
+                self.log(f"student_{i}/test/acc", acc, on_step=False, on_epoch=True, prog_bar=True)
         
         loss = sum(losses)
 

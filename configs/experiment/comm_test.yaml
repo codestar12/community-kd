@@ -10,6 +10,7 @@ defaults:
   - override /datamodule: imagenet_bolt.yaml
   - override /callbacks: default.yaml
   - override /logger: wandb.yaml
+  - override /callbacks: default.yaml
 
 # all parameters below will be merged with parameters from default configurations set above
 # this allows you to overwrite only specified parameters
@@ -21,8 +22,11 @@ name: "timm_res"
 seed: 12345
 
 trainer:
+  # uncomment for very fast testing batches
+  # limit_train_batches: 0.1
+  # limit_val_batches: 0.1
   min_epochs: 1
-  max_epochs: 10
+  max_epochs: 12
   precision: 16
   accelerator: gpu
   strategy: ddp
@@ -33,5 +37,17 @@ trainer:
 
 datamodule:
   batch_size: 128
+
+callbacks:
+  early_stopping:
+    monitor: "teacher/val/acc"
+    patience: 10
+
+  model_checkpoint:
+    monitor: "teacher/val/acc"
+
+logger:
+  wandb:
+    log_model: True
 
 
