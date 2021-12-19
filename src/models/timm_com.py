@@ -1,3 +1,4 @@
+from os import sched_getscheduler
 from re import I, T
 from typing import Any, List, Tuple
 
@@ -8,6 +9,7 @@ import torch.nn as nn
 
 from pytorch_lightning import LightningModule
 from torchmetrics.classification.accuracy import Accuracy
+from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
 
 from .modules.kd_loss import DistillKL
 
@@ -168,6 +170,20 @@ class CommKD(LightningModule):
         See examples here:
             https://pytorch-lightning.readthedocs.io/en/latest/common/lightning_module.html#configure-optimizers
         """
-        return torch.optim.Adam(
+        optimizer = torch.optim.Adam(
             params=self.parameters(), lr=self.hparams.lr, weight_decay=self.hparams.weight_decay
         )
+
+        sched = LinearWarmupCosineAnnealingLR(optimizer=optimizer, warmup_epochs=1, max_epochs=50)
+
+        return (
+            {
+                "optimizer" : optimizer,
+                "lr_scheduler": {
+                    "scheduler": sched,
+                    "monitor": "teacher/val/acc"
+                }
+            }
+        )
+
+
