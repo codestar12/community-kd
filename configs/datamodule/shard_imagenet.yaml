@@ -1,0 +1,14 @@
+_target_: src.datamodules.imagenet_datamodule.ShardImagenetData
+
+shards:
+  imagenet-train-{000000..000146}.tar
+
+valshards:
+  imagenet-val-{000000..000006}.tar
+
+bucket:
+  ${oc.env:SHARD_IMAGENET}
+  
+batch_size: 128
+pin_memory: True
+num_workers: 4
