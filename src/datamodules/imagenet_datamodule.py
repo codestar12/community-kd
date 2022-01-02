@@ -79,7 +79,11 @@ class ShardImagenetData(pl.LightningDataModule):
             .batched(self.batch_size, partial=False)
         )
 
+<<<<<<< HEAD
         #dataset.length = dataset // self.batch_size
+=======
+        dataset.length = dataset_size // self.batch_size
+>>>>>>> 34a610b50a241d787616905aa8d5d5ad2b086fa0
 
         loader = wds.WebLoader(
             wds.extradatasets.FakeLength(dataset, dataset_size // self.batch_size),
