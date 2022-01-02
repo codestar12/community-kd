@@ -63,9 +63,9 @@ class ShardImagenetData(pl.LightningDataModule):
 
         if mode == "train":
             dataset_size = 1281167
-            shuffle = 5000
+            shuffle = 10000
         elif mode == "val":
-            dataset_size = 5000
+            dataset_size = 50000
             shuffle = 0
 
         transform = self.make_transform(mode=mode)
@@ -79,10 +79,10 @@ class ShardImagenetData(pl.LightningDataModule):
             .batched(self.batch_size, partial=False)
         )
 
-        dataset.length = dataset // self.batch_size
+        #dataset.length = dataset // self.batch_size
 
         loader = wds.WebLoader(
-            dataset,
+            wds.extradatasets.FakeLength(dataset, dataset_size // self.batch_size),
             batch_size=None,
             shuffle=False,
             num_workers=self.num_workers,
@@ -93,8 +93,8 @@ class ShardImagenetData(pl.LightningDataModule):
 
         if mode == "train":
             # ensure same number of batches in all clients
-            loader = loader.ddp_equalize(dataset_size // self.batch_size)
-            # print("# loader length", len(loader))
+            loader = loader.ddp_equalize(dataset_size // self.batch_size, with_length=True)
+            print("# loader length", len(loader))
 
         return loader
 

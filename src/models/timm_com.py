@@ -1,9 +1,10 @@
 from os import sched_getscheduler
 from re import I, T
-from typing import Any, List, Tuple
+from typing import Any, List, Tuple, Union
 
 import timm
 import torch
+import numpy as np
 
 import torch.nn as nn
 
@@ -11,7 +12,30 @@ from pytorch_lightning import LightningModule
 from torchmetrics.classification.accuracy import Accuracy
 from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
 
+
 from .modules.kd_loss import DistillKL
+
+
+def return_kd_weight(delay, trans, epoch,  weight):
+
+    rates = np.linspace(0.0, weight, num=trans)
+    if epoch < delay:
+        return 0
+    elif epoch - delay < trans:
+        return rates[epoch - delay]
+    else:
+        return weight
+
+
+def return_hard_weight(delay, trans, epoch, weight_end, weight_start):
+    rates = np.linspace(weight_start, weight_end, num=trans)
+    if epoch < delay:
+        return weight_start
+    elif epoch - delay < trans:
+        return rates[epoch - delay]
+    else:
+        return weight_end
+ 
 
 
 class CommKD(LightningModule):
@@ -19,23 +43,40 @@ class CommKD(LightningModule):
     def __init__(
         self,
         teacher_model: str,
-        student_model: str,
+        student_model: Union[str, List[str]],
         num_students: int,
         kd_weights: List[List[float]],
+        kd_trans_epochs: Union[int, List[int]] = 0,
+        kd_delay: Union[int, List[int]] = 0,
+        hard_label_start: Union[float, List[float]] = 0.1,
+        hard_label_end: Union[float, List[float]] = 0.1,
         lr: float = 0.001,
         weight_decay: float = 0.0005,
+        num_classes: int = 1000,
+        lr_milestones: List[int] = [50, 80]
     ) -> None:
 
         super().__init__()
         self.num_students: int = num_students
+        self.num_classes = num_classes
 
-        __community = [timm.create_model(teacher_model)] + [timm.create_model(student_model) for i in range(num_students)]
+        if isinstance(student_model, str):
+            __community = [timm.create_model(teacher_model, num_classes=self.num_classes)] + [timm.create_model(student_model, num_classes=self.num_classes) for i in range(num_students)]
+        else:
+            __community = [timm.create_model(teacher_model, num_classes=self.num_classes)] + [timm.create_model(student, num_classes=self.num_classes) for student in student_model]
 
         self.community = nn.ModuleList(__community)
 
         self.criterion = nn.CrossEntropyLoss()
         self.kd_weights = kd_weights
         self.kd_loss = DistillKL()
+
+        self.hard_label_start = hard_label_start
+        self.hard_label_end = hard_label_end
+        self.kd_delay = kd_delay
+        self.kd_trans_epochs = kd_trans_epochs 
+
+        self.student_hard_label = self.hard_label_start
 
         self.train_acc = nn.ModuleList(
             [Accuracy() for i in range(self.num_students + 1)]
@@ -74,7 +115,11 @@ class CommKD(LightningModule):
             if i == 0:
                 model_loss.append(hard_loss)
             else:
-                model_loss.append(hard_loss * 0.1)
+                if isinstance(self.student_hard_label, float):
+                    model_loss.append(hard_loss * self.student_hard_label)
+                else:
+                    model_loss.append(hard_loss * self.student_hard_label[i - 1])
+
 
             for j, weight in enumerate(weights):
                 s_logits = outputs[j]
@@ -82,7 +127,14 @@ class CommKD(LightningModule):
                 if j != i:
                     soft_loss = self.kd_loss(logits, s_logits.detach())
 
-                model_loss.append(soft_loss * weight)
+                final_weight = return_kd_weight(
+                    self.kd_delay,
+                    self.kd_trans_epochs,
+                    self.current_epoch,
+                    weight
+                )
+
+                model_loss.append(soft_loss * final_weight)
 
             losses.append(sum(model_loss))
 
@@ -162,6 +214,14 @@ class CommKD(LightningModule):
             self.train_acc[i].reset()
             self.test_acc[i].reset()
             self.val_acc[i].reset()
+        
+        self.student_hard_label = return_hard_weight(
+            self.kd_delay,
+            self.kd_trans_epochs,
+            self.current_epoch,
+            self.hard_label_end,
+            self.hard_label_start,
+        )
 
     def configure_optimizers(self):
         """Choose what optimizers and learning-rate schedulers to use in your optimization.
@@ -174,7 +234,7 @@ class CommKD(LightningModule):
             params=self.parameters(), lr=self.hparams.lr, weight_decay=self.hparams.weight_decay
         )
 
-        sched = LinearWarmupCosineAnnealingLR(optimizer=optimizer, warmup_epochs=1, max_epochs=50)
+        sched = torch.optim.lr_scheduler.MultiStepLR(optimizer=optimizer, milestones=self.hparams.lr_milestones)
 
         return (
             {
