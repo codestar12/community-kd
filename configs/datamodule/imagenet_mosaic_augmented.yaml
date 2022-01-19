@@ -1,0 +1,6 @@
+_target_: src.datamodules.imagenet_mosaic_augmentations.ImagenetMosaicAugmented
+
+data_dir: ${data_dir}/imagenet
+batch_size: 64
+pin_memory: True
+num_workers: 4

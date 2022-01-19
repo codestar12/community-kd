@@ -4,8 +4,8 @@
 defaults:
   - _self_
   - trainer: default.yaml
-  - model: mnist_model.yaml
-  - datamodule: mnist_datamodule.yaml
+  - model: resnet50_timm.yaml
+  - datamodule: imagenette_datamodule.yaml
   - callbacks: default.yaml
   - logger: null # set logger here or use command line (e.g. `python run.py logger=wandb`)
 
@@ -38,10 +38,10 @@ ignore_warnings: True
 
 # evaluate on test set, using best model weights achieved during training
 # lightning chooses best weights based on metric specified in checkpoint callback
-test_after_training: True
+test_after_training: False
 
 # seed for random number generators in pytorch, numpy and python.random
-seed: null
+seed: 17
 
 # name of the run is accessed by loggers
 # should be used along with experiment mode

@@ -6,7 +6,10 @@ import torch
 from pytorch_lightning import LightningModule
 from torchmetrics import MaxMetric
 from torchmetrics.classification.accuracy import Accuracy
-
+import bitsandbytes
+from composer.optim import scheduler
+from torch.optim.lr_scheduler import CosineAnnealingLR
+from composer.optim.pytorch_future import WarmUpLR
 
 class ResNet(LightningModule):
 
@@ -23,7 +26,7 @@ class ResNet(LightningModule):
 
         self.num_classes = num_classes
 
-        self.model = timm.create_model('resnet34', num_classes=self.num_classes)
+        self.model = timm.create_model('resnet50', num_classes=self.num_classes)
         self.criterion = torch.nn.CrossEntropyLoss()
 
         self.train_acc = Accuracy()
@@ -93,6 +96,27 @@ class ResNet(LightningModule):
         See examples here:
             https://pytorch-lightning.readthedocs.io/en/latest/common/lightning_module.html#configure-optimizers
         """
-        return torch.optim.Adam(
-            params=self.parameters(), lr=self.hparams.lr, weight_decay=self.hparams.weight_decay
-        )
+        # return torch.optim.Adam(
+        #     params=self.parameters(), lr=self.hparams.lr, weight_decay=self.hparams.weight_decay
+        # )
+        # optimizer_list = []
+        # scheduler_list = []
+
+        optimizer = bitsandbytes.optim.Adam8bit(params=self.parameters(), 
+                                                lr=self.hparams.lr, 
+                                                weight_decay=self.hparams.weight_decay)
+
+        scheduler1 = CosineAnnealingLR(optimizer=optimizer, T_max=82, eta_min=0)
+        
+        scheduler1_config = {"scheduler": scheduler1,
+                             "interval": "step"}
+
+        # scheduler2 = WarmUpLR(optimizer=optimizer, warmup_factor=0 ,warmup_iters=8)
+
+        # scheduler2_config = {"scheduler": scheduler2,
+        #                      "interval": "step"}
+
+        
+
+        return {"optimizer": optimizer,
+                "lr_scheduler": scheduler1_config}

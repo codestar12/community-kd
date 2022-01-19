@@ -1,6 +1,6 @@
 _target_: src.datamodules.imagenette_datamodule.ImagenetteModule
 
-data_dir: ${oc.env:IMAGENETTE} # data_dir is specified in config.yaml
-batch_size: 256
+data_dir: ${data_dir}/imagenette # data_dir is specified in config.yaml
+batch_size: 64
 num_workers: 16
 pin_memory: True
