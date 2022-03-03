@@ -1,0 +1,6 @@
+_target_: pl_bolts.datamodules.cifar10_datamodule.CIFAR10DataModule
+
+data_dir: ${data_dir}/cifar10
+batch_size: 64
+pin_memory: True
+num_workers: 4

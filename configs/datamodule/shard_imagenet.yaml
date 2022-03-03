@@ -7,8 +7,8 @@ valshards:
   imagenet-val-{000000..000006}.tar
 
 bucket:
-  ${oc.env:SHARD_IMAGENET}
+  ${data_dir}/imagenet_shards
   
-batch_size: 128
+batch_size: 64
 pin_memory: True
 num_workers: 4
