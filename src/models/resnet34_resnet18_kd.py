@@ -22,7 +22,7 @@ class ResNet(LightningModule):
         self,
         lr: float = 0.001,
         weight_decay: float = 0.0005,
-        num_classes: int = 10,
+        num_classes: int = 1000,
     )->None:
 
         super().__init__()
@@ -33,7 +33,7 @@ class ResNet(LightningModule):
         self.lr = lr
         self.weight_decay = weight_decay
         
-        self.teacher_model = timm.create_model('resnet50', num_classes=self.num_classes, pretrained=False)
+        self.teacher_model = timm.create_model('resnet34', num_classes=self.num_classes, pretrained=True)
         self.teacher_model = WrappedResnet(self.teacher_model)
         self.teacher_model.model.train(False)
 
@@ -41,29 +41,27 @@ class ResNet(LightningModule):
         self.student_model = WrappedResnet(self.student_model)
 
         self.criterion = torch.nn.CrossEntropyLoss()
-        self.distill_loss = Similarity()
-        self.div_loss = DistillKL()
-
+        self.distill_loss = DistillKL()
+        
         self.train_acc = Accuracy()
         self.val_acc = Accuracy()
 
     
     def forward(self, x: torch.Tensor):
-        feat_s, logit_s = self.student_model(x)
-        feat_t, logit_t = self.teacher_model(x)
-        feat_t = [f.detach() for f in feat_t]
-        return feat_s, feat_t, logit_s, logit_t
+        logit_s = self.student_model(x)
+        logit_t = self.teacher_model(x)
+        return logit_s, logit_t
+
 
     def step(self, batch: Any):
         x, y = batch
         #logits = self.forward(x)
-        feat_s, feat_t, logit_s, logit_t = self.forward(x)
+        logit_s, logit_t = self.forward(x)
         hard_loss = self.criterion(logit_s, y) #loss_cls
-        soft_loss = self.distill_loss([feat_s[-1]], [feat_t[-1]]) #loss_kd
-        loss_div = self.div_loss(logit_s, logit_t)   #loss_div
-        
+        soft_loss = self.distill_loss(logit_s, logit_t) #loss_kd
+
         preds = torch.argmax(logit_s, dim=1)
-        loss = 1 * hard_loss + 0 * loss_div + 1 * soft_loss
+        loss = 1 * hard_loss +  0.9 * soft_loss
         return loss, preds, y
 
     def training_step(self, batch: Any, batch_idx: int):

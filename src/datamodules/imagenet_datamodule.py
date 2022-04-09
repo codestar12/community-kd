@@ -15,11 +15,11 @@ def identity(x):
 class ShardImagenetData(pl.LightningDataModule):
     def __init__(
         self,
-        shards=None,
-        valshards=None,
+        shards='imagenet-train-{000000..000146}.tar',
+        valshards='imagenet-val-{000000..000006}.tar',
         batch_size=64,
         workers=4,
-        bucket=None,
+        bucket='data/imagenet_shards',
         pin_memory=False,
         **kw
     ) -> None:
@@ -79,11 +79,7 @@ class ShardImagenetData(pl.LightningDataModule):
             .batched(self.batch_size, partial=False)
         )
 
-<<<<<<< HEAD
         #dataset.length = dataset // self.batch_size
-=======
-        dataset.length = dataset_size // self.batch_size
->>>>>>> 34a610b50a241d787616905aa8d5d5ad2b086fa0
 
         loader = wds.WebLoader(
             wds.extradatasets.FakeLength(dataset, dataset_size // self.batch_size),

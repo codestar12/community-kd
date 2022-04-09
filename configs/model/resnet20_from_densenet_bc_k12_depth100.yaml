@@ -1,0 +1,4 @@
+_target_: src.models.resnet20_from_densenet_bc_k12_depth100.ResNet
+
+lr: 0.1
+weight_decay: 0.0001

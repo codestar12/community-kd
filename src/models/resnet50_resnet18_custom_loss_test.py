@@ -14,7 +14,8 @@ from .modules.at_loss import Attention
 from .modules.model_wrapper import ModelWrapper
 from .modules.wrapped_resnet import WrappedResnet
 from .modules.kd_loss import DistillKL
-from .modules.sp_loss import Similarity
+from .modules.pkt_loss import PKT
+from .torchdistill.custom_loss import GeneralizedCustomLoss
 
 class ResNet(LightningModule):
 ###
@@ -40,9 +41,8 @@ class ResNet(LightningModule):
         self.student_model = timm.create_model('resnet18', num_classes=self.num_classes, pretrained=False)
         self.student_model = WrappedResnet(self.student_model)
 
-        self.criterion = torch.nn.CrossEntropyLoss()
-        self.distill_loss = Similarity()
-        self.div_loss = DistillKL()
+        self.criterion = GeneralizedCustomLoss()
+        self.distill_loss = DistillKL()
 
         self.train_acc = Accuracy()
         self.val_acc = Accuracy()
@@ -58,12 +58,14 @@ class ResNet(LightningModule):
         x, y = batch
         #logits = self.forward(x)
         feat_s, feat_t, logit_s, logit_t = self.forward(x)
-        hard_loss = self.criterion(logit_s, y) #loss_cls
-        soft_loss = self.distill_loss([feat_s[-1]], [feat_t[-1]]) #loss_kd
-        loss_div = self.div_loss(logit_s, logit_t)   #loss_div
+
+        output_dict = {'student': extracted_model_io_dict, 'teacher': dict()}
+        hard_loss = self.criterion(output_dict, y) #loss_cls
+        
+        soft_loss = self.distill_loss(logit_s, logit_t) #loss_kd
         
         preds = torch.argmax(logit_s, dim=1)
-        loss = 1 * hard_loss + 0 * loss_div + 1 * soft_loss
+        loss = 1 * hard_loss + 1 * soft_loss
         return loss, preds, y
 
     def training_step(self, batch: Any, batch_idx: int):

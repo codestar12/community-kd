@@ -1,0 +1,4 @@
+_target_: src.models.resnet34_resnet18_kd.ResNet
+
+lr: 0.1
+weight_decay: 0.0001

@@ -14,14 +14,17 @@ from .modules.at_loss import Attention
 from .modules.model_wrapper import ModelWrapper
 from .modules.wrapped_resnet import WrappedResnet
 from .modules.kd_loss import DistillKL
-from .modules.sp_loss import Similarity
+
+from .torchdistill.densenet import densenet_bc_k12_depth100
+from .torchdistill.resnet import resnet20
+from .torchdistill.custom_loss import GeneralizedCustomLoss
 
 class ResNet(LightningModule):
-###
+
     def __init__(
         self,
-        lr: float = 0.001,
-        weight_decay: float = 0.0005,
+        lr: float = 0.1,
+        weight_decay: float = 0.0001,
         num_classes: int = 10,
     )->None:
 
@@ -33,37 +36,33 @@ class ResNet(LightningModule):
         self.lr = lr
         self.weight_decay = weight_decay
         
-        self.teacher_model = timm.create_model('resnet50', num_classes=self.num_classes, pretrained=False)
-        self.teacher_model = WrappedResnet(self.teacher_model)
-        self.teacher_model.model.train(False)
+        self.teacher_model = densenet_bc_k12_depth100()
+        self.teacher_model.load_state_dict(torch.load('/home/nathaniel/community-kd/src/models/torchdistill/checkpoints/cifar10-densenet_bc_k12_depth100.pt'))
+        self.teacher_model.train(False)
 
-        self.student_model = timm.create_model('resnet18', num_classes=self.num_classes, pretrained=False)
-        self.student_model = WrappedResnet(self.student_model)
+        self.student_model = resnet20()
 
         self.criterion = torch.nn.CrossEntropyLoss()
-        self.distill_loss = Similarity()
-        self.div_loss = DistillKL()
+        self.distill_loss = DistillKL()
 
         self.train_acc = Accuracy()
         self.val_acc = Accuracy()
 
     
     def forward(self, x: torch.Tensor):
-        feat_s, logit_s = self.student_model(x)
-        feat_t, logit_t = self.teacher_model(x)
-        feat_t = [f.detach() for f in feat_t]
-        return feat_s, feat_t, logit_s, logit_t
+        logit_s = self.student_model(x)
+        logit_t = self.teacher_model(x)
+        return logit_s, logit_t
 
     def step(self, batch: Any):
         x, y = batch
         #logits = self.forward(x)
-        feat_s, feat_t, logit_s, logit_t = self.forward(x)
+        logit_s, logit_t = self.forward(x)
         hard_loss = self.criterion(logit_s, y) #loss_cls
-        soft_loss = self.distill_loss([feat_s[-1]], [feat_t[-1]]) #loss_kd
-        loss_div = self.div_loss(logit_s, logit_t)   #loss_div
-        
+        soft_loss = self.distill_loss(logit_s, logit_t) #loss_kd
+
         preds = torch.argmax(logit_s, dim=1)
-        loss = 1 * hard_loss + 0 * loss_div + 1 * soft_loss
+        loss = 1 * hard_loss +  0.9 * soft_loss
         return loss, preds, y
 
     def training_step(self, batch: Any, batch_idx: int):
@@ -119,28 +118,19 @@ class ResNet(LightningModule):
         See examples here:
             https://pytorch-lightning.readthedocs.io/en/latest/common/lightning_module.html#configure-optimizers
         """
-        # return torch.optim.Adam(
-        #     params=self.parameters(), lr=self.hparams.lr, weight_decay=self.hparams.weight_decay
-        # )
-        # optimizer_list = []
-        # scheduler_list = []
-        trainable_list = torch.nn.ModuleList([])
-        trainable_list.append(self.student_model)
-        
-        optimizer = torch.optim.Adam(
-            params=self.student_model.model.parameters(), lr=self.lr, weight_decay=self.weight_decay
+        optimizer = torch.optim.SGD(
+            params=self.student_model.parameters(), lr=self.lr, weight_decay=self.weight_decay, momentum=0.9
         )
 
-        scheduler1 = CosineAnnealingLR(optimizer=optimizer, T_max=82, eta_min=0)
-        
-        scheduler1_config = {"scheduler": scheduler1,
-                             "interval": "step"}
+        lr_milestones: List[int] = [91, 136]
+        sched = torch.optim.lr_scheduler.MultiStepLR(optimizer=optimizer, milestones=lr_milestones, gamma=0.1)
 
-        # scheduler2 = WarmUpLR(optimizer=optimizer, warmup_factor=0 ,warmup_iters=8)
-
-        # scheduler2_config = {"scheduler": scheduler2,
-        #                      "interval": "step"}
-
-        
-
-        return optimizer
+        return (
+            {
+                "optimizer" : optimizer,
+                "lr_scheduler": {
+                    "scheduler": sched,
+                    "monitor": "teacher/val/acc"
+                }
+            }
+        )
