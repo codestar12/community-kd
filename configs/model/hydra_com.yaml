@@ -1,0 +1,20 @@
+_target_: src.models.hydra_comm.CommKD
+
+lr: 0.001
+weight_decay: 0.0005
+
+num_students: 2
+
+hard_label_start: 0.0
+hard_label_end: 0.1
+
+backbone: "Hydra50"
+periods: 1
+
+kd_trans_epochs: 0
+kd_delay: 1
+
+kd_weights:
+  - [0.0, 0.1, 0.1]
+  - [0.9, 0.0, 0.1]
+  - [0.9, 0.9, 0.0]

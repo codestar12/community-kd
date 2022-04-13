@@ -21,10 +21,14 @@ class ShardImagenetData(pl.LightningDataModule):
         workers=4,
         bucket=None,
         pin_memory=False,
+        train_size: int = 224,
+        test_size: int = 224,
         **kw
     ) -> None:
         super().__init__(self)
-        self.normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        self.normalize = transforms.Normalize(
+            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+        )
         self.training_urls = os.path.join(bucket, shards)
         print("training_urls = ", self.training_urls)
         self.val_urls = os.path.join(bucket, valshards)
@@ -32,13 +36,15 @@ class ShardImagenetData(pl.LightningDataModule):
         self.batch_size = batch_size
         self.num_workers = workers
         self.pin_memory = pin_memory
+        self.train_size = train_size
+        self.test_size = test_size
         print("batch_size", self.batch_size, "num_workers", self.num_workers)
 
     def make_transform(self, mode: str = "train"):
         if mode == "train":
             return transforms.Compose(
                 [
-                    transforms.RandomResizedCrop(224),
+                    transforms.RandomResizedCrop(self.train_size),
                     transforms.RandomHorizontalFlip(),
                     transforms.ToTensor(),
                     self.normalize,
@@ -47,8 +53,9 @@ class ShardImagenetData(pl.LightningDataModule):
         elif mode == "val":
             return transforms.Compose(
                 [
-                    transforms.Resize(256),
-                    transforms.CenterCrop(224),
+                    # to maintain same ratio w.r.t. 224 images
+                    transforms.Resize(int((256 / 224) * self.test_size)),
+                    transforms.CenterCrop(self.test_size),
                     transforms.ToTensor(),
                     self.normalize,
                 ]
@@ -79,11 +86,7 @@ class ShardImagenetData(pl.LightningDataModule):
             .batched(self.batch_size, partial=False)
         )
 
-<<<<<<< HEAD
-        #dataset.length = dataset // self.batch_size
-=======
         dataset.length = dataset_size // self.batch_size
->>>>>>> 34a610b50a241d787616905aa8d5d5ad2b086fa0
 
         loader = wds.WebLoader(
             wds.extradatasets.FakeLength(dataset, dataset_size // self.batch_size),
@@ -97,7 +100,9 @@ class ShardImagenetData(pl.LightningDataModule):
 
         if mode == "train":
             # ensure same number of batches in all clients
-            loader = loader.ddp_equalize(dataset_size // self.batch_size, with_length=True)
+            loader = loader.ddp_equalize(
+                dataset_size // self.batch_size, with_length=True
+            )
             print("# loader length", len(loader))
 
         return loader

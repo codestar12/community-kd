@@ -7,7 +7,7 @@ defaults:
   - override /mode: exp.yaml
   - override /trainer: default.yaml
   - override /model: resnet50_timm.yaml
-  - override /datamodule: imagenet_bolt.yaml
+  - override /datamodule: imagenette_datamodule.yaml
   - override /callbacks: default.yaml
   - override /logger: wandb.yaml
 
@@ -22,13 +22,17 @@ seed: 12345
 
 trainer:
   min_epochs: 1
-  max_epochs: 10
+  max_epochs: 12
   precision: 16
   accelerator: gpu
   strategy: ddp
   devices:
     - 1
-    - 2
-    - 3
+
+model:
+  num_classes: 10
+
+datamodule:
+  batch_size: 512
 
 

@@ -4,14 +4,14 @@ lr: 0.001
 weight_decay: 0.0005
 
 teacher_model: 'resnet34'
-student_model: ['mobilenetv2_100','resnet18']
+student_model: ['resnet18','mobilenetv2_100',]
 num_students: 2
 
-hard_label_start: 1.0
+hard_label_start: 0.1
 hard_label_end: 0.1
 
-kd_trans_epochs: 20
-kd_delay: 20
+kd_trans_epochs: 0
+kd_delay: 0
 
 kd_weights:
   - [0.0, 0.1, 0.1]

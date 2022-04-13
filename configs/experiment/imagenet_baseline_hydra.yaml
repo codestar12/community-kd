@@ -6,8 +6,8 @@
 defaults:
   - override /mode: exp.yaml
   - override /trainer: default.yaml
-  - override /model: hydra_com.yaml
-  - override /datamodule: imagenette_datamodule.yaml
+  - override /model: hydra_com_baseline.yaml
+  - override /datamodule: shard_imagenet.yaml
   - override /callbacks: default.yaml
   - override /logger: wandb.yaml
   - override /callbacks: default.yaml
@@ -26,15 +26,15 @@ trainer:
   # limit_train_batches: 0.1
   # limit_val_batches: 0.1
   min_epochs: 1
-  max_epochs: 240
+  max_epochs: 100
   # when using webdataset this needs to be provided manually
   # should be floor(dataset size / batch size / num gpus) + 1
   # thats close enough for government work
   # total train batchs at 128 10009.1171875
   # total test batches at 128 390.625
   # 3 gpus batchsize 128
-  # limit_train_batches:  3337
-  # limit_val_batches: 131
+  limit_train_batches: 3337
+  limit_val_batches: 131
   # 2 gpus batchsize 128
   # limit_train_batches:  5005
   # limit_val_batches: 196
@@ -42,21 +42,29 @@ trainer:
   # limit_train_batches: 10010
   # limit_val_batches: 391
   precision: 16
-  check_val_every_n_epoch: 1
   accelerator: gpu
-  strategy: ddp
+  # strategy: ddp
+  strategy:
+    _target_: pytorch_lightning.strategies.DDPStrategy
+    find_unused_parameters: False
   devices:
     - 1
     - 2
     - 3
 
 datamodule:
-  batch_size: 64
-  workers: 6
+  batch_size: 256
+  num_workers: 4
+  pin_memory: False
+  train_size: 160
+  test_size: 224
 
 model:
-  num_classes: 10
+  num_classes: 1000
   lr_milestones: [100, 180]
+  lr: 0.008
+  weight_decay: 0.02
+  warmup: 5
 
 callbacks:
   early_stopping:
@@ -68,8 +76,8 @@ callbacks:
 
   # progressive_resize:
   #   _target_: src.callbacks.progressive_resize.ProgressiveResize
-  #   rescale_factors: [0.5, 0.75, 1.00]
-  #   rescale_schedule: [0, 100, 150]
+  #   rescale_factors: [0.25, 0.75, 1.00]
+  #   rescale_schedule: [0, 5, 10]
 
 logger:
   wandb:

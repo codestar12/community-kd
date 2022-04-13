@@ -11,6 +11,9 @@ import torch.nn as nn
 from pytorch_lightning import LightningModule
 from torchmetrics.classification.accuracy import Accuracy
 from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
+from .modules.hydra import Hydra29, Hydra50, Hydra41, Hydra35
+from timm.scheduler.cosine_lr import CosineLRScheduler
+from torch_optimizer import Lamb
 
 
 from .modules.kd_loss import DistillKL
@@ -40,40 +43,56 @@ def return_hard_weight(delay, trans, epoch, weight_end, weight_start):
 class CommKD(LightningModule):
     def __init__(
         self,
-        teacher_model: str,
-        student_model: Union[str, List[str]],
         num_students: int,
         kd_weights: List[List[float]],
+        backbone: str = "Hydra50",
         kd_trans_epochs: Union[int, List[int]] = 0,
         kd_delay: Union[int, List[int]] = 0,
         hard_label_start: Union[float, List[float]] = 0.1,
         hard_label_end: Union[float, List[float]] = 0.1,
         lr: float = 0.001,
+        student_layers: List[List[int]] = [],
         weight_decay: float = 0.0005,
         num_classes: int = 1000,
         lr_milestones: List[int] = [50, 80],
+        periods: int = 1,
+        warmup: int = 5,
     ) -> None:
 
         super().__init__()
         self.num_students: int = num_students
         self.num_classes = num_classes
+        self.periods = periods
+        self.warmup = warmup
 
-        if isinstance(student_model, str):
-            __community = [
-                timm.create_model(teacher_model, num_classes=self.num_classes)
-            ] + [
-                timm.create_model(student_model, num_classes=self.num_classes)
-                for i in range(num_students)
-            ]
+        if backbone == "Hydra50":
+            self.model = Hydra50(
+                num_classes,
+                channels=3,
+                student_layers=student_layers,
+                num_heads=num_students + 1,
+            )
+        elif backbone == "Hyrdra41":
+            self.model = Hydra41(
+                num_classes,
+                channels=3,
+                student_layers=student_layers,
+                num_heads=num_students + 1,
+            )
+        elif backbone == "Hydra35":
+            self.model = Hydra35(
+                num_classes,
+                channels=3,
+                student_layers=student_layers,
+                num_heads=num_students + 1,
+            )
         else:
-            __community = [
-                timm.create_model(teacher_model, num_classes=self.num_classes)
-            ] + [
-                timm.create_model(student, num_classes=self.num_classes)
-                for student in student_model
-            ]
-
-        self.community = nn.ModuleList(__community)
+            self.model = Hydra29(
+                num_classes,
+                channels=3,
+                student_layers=student_layers,
+                num_heads=num_students + 1,
+            )
 
         self.criterion = nn.CrossEntropyLoss()
         self.kd_weights = kd_weights
@@ -97,11 +116,8 @@ class CommKD(LightningModule):
         self.save_hyperparameters(logger=False)
 
     def forward(self, x: torch.Tensor):
-        outs = []
-        for m in self.community:
-            outs.append(m(x))
 
-        return torch.stack(outs)
+        return self.model(x)
 
     def step(self, batch: Any):
 
@@ -281,13 +297,7 @@ class CommKD(LightningModule):
     def test_epoch_end(self, outputs: List[Any]):
         pass
 
-    def on_epoch_end(self):
-        # reset metrics at the end of every epoch!
-        for i in range(self.num_students + 1):
-            self.train_acc[i].reset()
-            self.test_acc[i].reset()
-            self.val_acc[i].reset()
-
+    def on_epoch_start(self):
         if isinstance(self.kd_delay, int):
             self.student_hard_label = return_hard_weight(
                 self.kd_delay,
@@ -306,6 +316,13 @@ class CommKD(LightningModule):
                     self.hard_label_start,
                 )
 
+    def on_epoch_end(self):
+        # reset metrics at the end of every epoch!
+        for i in range(self.num_students + 1):
+            self.train_acc[i].reset()
+            self.test_acc[i].reset()
+            self.val_acc[i].reset()
+
     def configure_optimizers(self):
         """Choose what optimizers and learning-rate schedulers to use in your optimization.
         Normally you'd need one. But in the case of GANs or similar you might have multiple.
@@ -313,17 +330,23 @@ class CommKD(LightningModule):
         See examples here:
             https://pytorch-lightning.readthedocs.io/en/latest/common/lightning_module.html#configure-optimizers
         """
-        optimizer = torch.optim.Adam(
+        optimizer = Lamb(
             params=self.parameters(),
             lr=self.hparams.lr,
             weight_decay=self.hparams.weight_decay,
         )
 
-        sched = torch.optim.lr_scheduler.MultiStepLR(
-            optimizer=optimizer, milestones=self.hparams.lr_milestones
+        sched = CosineLRScheduler(
+            optimizer=optimizer,
+            t_initial=self.trainer.max_epochs / self.periods,
+            warmup_t=self.warmup,
+            warmup_lr_init=1e-5,
         )
 
         return {
             "optimizer": optimizer,
             "lr_scheduler": {"scheduler": sched, "monitor": "teacher/val/acc"},
         }
+
+    def lr_scheduler_step(self, scheduler, optimizer_idx: int, metric) -> None:
+        return scheduler.step(epoch=self.current_epoch)

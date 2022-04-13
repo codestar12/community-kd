@@ -8,20 +8,24 @@ from torchvision.datasets import ImageFolder
 
 
 class ImagenetteModule(pl.LightningDataModule):
-
     def __init__(
         self,
         data_dir: str = "data/",
         batch_size: int = 64,
         num_workers: int = 0,
         pin_memory: bool = False,
-        **kw
+        train_size: int = 224,
+        test_size: int = 224,
+        **kw,
     ) -> None:
         super().__init__(self)
 
         self.save_hyperparameters(logger=False)
-        self.normalize = transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
-
+        self.normalize = transforms.Normalize(
+            mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]
+        )
+        self.train_size = train_size
+        self.test_size = test_size
 
     @property
     def num_classes(self) -> int:
@@ -31,7 +35,7 @@ class ImagenetteModule(pl.LightningDataModule):
         if mode == "train":
             return transforms.Compose(
                 [
-                    transforms.RandomResizedCrop(224),
+                    transforms.RandomResizedCrop(self.train_size),
                     transforms.RandomHorizontalFlip(),
                     transforms.ToTensor(),
                     self.normalize,
@@ -40,8 +44,9 @@ class ImagenetteModule(pl.LightningDataModule):
         elif mode == "val":
             return transforms.Compose(
                 [
-                    transforms.Resize(256),
-                    transforms.CenterCrop(224),
+                    # to maintain same ratio w.r.t. 224 images
+                    transforms.Resize(int((256 / 224) * self.test_size)),
+                    transforms.CenterCrop(self.test_size),
                     transforms.ToTensor(),
                     self.normalize,
                 ]
@@ -60,7 +65,7 @@ class ImagenetteModule(pl.LightningDataModule):
             batch_size=self.hparams.batch_size,
             num_workers=self.hparams.num_workers,
             pin_memory=self.hparams.pin_memory,
-            shuffle=shuffle
+            shuffle=shuffle,
         )
 
     def train_dataloader(self):

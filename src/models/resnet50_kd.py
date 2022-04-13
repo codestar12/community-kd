@@ -6,7 +6,7 @@ import torch
 from pytorch_lightning import LightningModule
 from torchmetrics import MaxMetric
 from torchmetrics.classification.accuracy import Accuracy
-from composer import functional as cf
+
 
 class ResNet(LightningModule):
 
@@ -29,21 +29,12 @@ class ResNet(LightningModule):
         self.train_acc = Accuracy()
         self.val_acc = Accuracy()
 
-        self.rescale_values = {
-            0: 0.25,
-            1: 0.5, 
-            2: 1.0
-        }
-
-        self.current_scale = 0.25
-
     
     def forward(self, x: torch.Tensor):
         return self.model(x)
 
     def step(self, batch: Any):
         x, y = batch
-        x, y = cf.resize_batch(x, y, scale_factor=self.current_scale, mode="resize")
         logits = self.forward(x)
         loss = self.criterion(logits, y)
         preds = torch.argmax(logits, dim=1)
@@ -94,9 +85,6 @@ class ResNet(LightningModule):
         self.train_acc.reset()
         #self.test_acc.reset()
         self.val_acc.reset()
-
-        if self.current_epoch in self.rescale_values:
-            self.current_scale = self.rescale_values[self.current_epoch]
 
     def configure_optimizers(self):
         """Choose what optimizers and learning-rate schedulers to use in your optimization.

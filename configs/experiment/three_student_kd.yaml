@@ -17,7 +17,7 @@ defaults:
 
 # name of the run determines folder name in logs
 # it's also accessed by loggers
-name: "hydra_res"
+name: "timm_res"
 
 seed: 12345
 
@@ -51,12 +51,18 @@ trainer:
     - 3
 
 datamodule:
-  batch_size: 64
+  batch_size: 128
   workers: 6
 
 model:
   num_classes: 10
   lr_milestones: [100, 180]
+  num_students: 3
+  kd_weights:
+    - [0.0, 0.0, 0.0, 0.0]
+    - [0.9, 0.0, 0.0, 0.0]
+    - [0.9, 0.0, 0.0, 0.0]
+    - [0.9, 0.0, 0.0, 0.0]
 
 callbacks:
   early_stopping:
@@ -65,11 +71,6 @@ callbacks:
 
   model_checkpoint:
     monitor: "teacher/val/acc"
-
-  # progressive_resize:
-  #   _target_: src.callbacks.progressive_resize.ProgressiveResize
-  #   rescale_factors: [0.5, 0.75, 1.00]
-  #   rescale_schedule: [0, 100, 150]
 
 logger:
   wandb:

@@ -3,9 +3,9 @@ _target_: src.models.timm_com.CommKD
 lr: 0.001
 weight_decay: 0.0005
 
-teacher_model: 'resnet18'
-student_model: 'resnet18'
+teacher_model: "resnet101"
+student_model: "resnet18"
 num_students: 0
 
 kd_weights:
-  - [0.0, ]
+  - [0.0]

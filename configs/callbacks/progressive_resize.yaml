@@ -1,0 +1,4 @@
+progressive_resize:
+    _target_: src.callbacks.progressive_resize.ProgressiveResize
+    rescale_factors: [0.5, 0.75, 1.00]
+    rescale_schedule: [0, 100, 150]

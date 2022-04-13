@@ -1,0 +1,54 @@
+program: run.py
+
+method: grid
+
+project: "communities-vision"
+
+name: "kd-weight-sweep"
+
+metric:
+  goal: maximize
+  name: student_1/val/acc
+parameters:
+  model.hard_label_start:
+    value: 1.4
+  model.kd_trans_epochs:
+    value: 25
+  model.hard_label_end:
+    value: 0.23
+  model.kd_delay:
+    value: 25
+  model.weight_decay:
+    value: 0.0002983
+  model.lr:
+    value: 0.001167
+  model.teacher_model:
+    values: 
+      - 'resnet34'
+      - 'resnet34d'
+      - 'resnet50'
+      - 'resnet50d'
+      - 'resnext50_32x4d'
+  model.kd_weights:
+    values:
+      - [[0.0, 0.07463477, 0.2789556],
+        [0.9, 0.0,        0.30309207],
+        [0.9, 0.84678264, 0.0]]
+      - [[0.0, 0.17927104, 0.17542121],
+        [0.9, 0.0,        0.10816527],
+        [0.9, 0.23348711, 0.0]]
+      - [[0.0, 0.24649505, 0.2149079],
+        [0.9, 0.0,        0.73460687],
+        [0.9, 0.71406812, 0.0]]
+      - [[0.0, 0.21163901, 0.24828875],
+        [0.9, 0.0,        0.1951985],
+        [0.9, 0.26094938, 0.0]]
+      - [[0.0, 0.15953895, 0.10867037],
+        [0.9, 0.0,        0.37661513],
+        [0.9, 0.66376237, 0.0]]
+command:
+  - ${interpreter}
+  - ${program}
+  - ${args_no_hyphens}
+  - logger=wandb
+  - experiment=comm_test.yaml

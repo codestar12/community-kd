@@ -50,26 +50,6 @@
 # python run.py experiment=one_student_codistill.yaml model.periods=2 model.student_layers="[[1,1]]" name=one_student_codistill_t2_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
 # python run.py experiment=one_student_codistill.yaml model.periods=2 model.student_layers="[[1,1]]" name=one_student_codistill_t2_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
 
-python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.2 model.student_layers="[[1,1]]" name=one_student_codistill_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
-python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.2 model.student_layers="[[1,1]]" name=one_student_codistill_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
-
-python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.3 model.student_layers="[[1,1]]" name=one_student_codistill_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
-python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.3 model.student_layers="[[1,1]]" name=one_student_codistill_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
-
-python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.4 model.student_layers="[[1,1]]" name=one_student_codistill_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
-python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.4 model.student_layers="[[1,1]]" name=one_student_codistill_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
-
-python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.5 model.student_layers="[[1,1]]" name=one_student_codistill_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
-python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.5 model.student_layers="[[1,1]]" name=one_student_codistill_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
-
-python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.2 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
-python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.2 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
-
-python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.3 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
-python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.3 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
-
-python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.4 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
-python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.4 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
-
-python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.5 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
-python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.5 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
+python run.py experiment=baseline_hydra_imagenette.yaml name=160_train_bs256_workers9_pin_memory_false datamodule.pin_memory=False datamodule.num_workers=9 logger.wandb.project="hydra_half_community" seed=12345
+python run.py experiment=baseline_hydra_imagenette.yaml name=160_train_bs256_workers6_pin_memory_false datamodule.pin_memory=False datamodule.num_workers=6 logger.wandb.project="hydra_half_community" seed=12345
+python run.py experiment=baseline_hydra_imagenette.yaml name=160_train_bs256_workers4_pin_memory_false datamodule.pin_memory=False datamodule.num_workers=4 logger.wandb.project="hydra_half_community" seed=12345
