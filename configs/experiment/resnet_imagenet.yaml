@@ -7,7 +7,7 @@ defaults:
   - override /mode: exp.yaml
   - override /trainer: default.yaml
   - override /model: resnet50_timm.yaml
-  - override /datamodule: imagenette_datamodule.yaml
+  - override /datamodule: ffcv_imagenet.yaml
   - override /callbacks: default.yaml
   - override /logger: wandb.yaml
 
@@ -27,10 +27,10 @@ trainer:
   accelerator: gpu
   strategy: ddp
   devices:
-    - 1
+    - 0
 
 model:
-  num_classes: 10
+  num_classes: 1000
 
 datamodule:
   batch_size: 512

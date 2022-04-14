@@ -1,0 +1,9 @@
+_target_: src.datamodules.ffcv_imagenet.FfcvImagenet
+
+train_dataset: ${oc.env:FFCV_TRAIN}
+val_dataset: ${oc.env:FFCV_VAL}
+batch_size: 64
+num_workers: 4
+in_memory: True
+train_size: 224
+test_size: 224
