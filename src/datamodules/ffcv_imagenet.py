@@ -49,7 +49,6 @@ class FfcvImagenet(pl.LightningDataModule):
             self.decoder,
             RandomHorizontalFlip(),
             ToTensor(),
-            ToDevice(torch.device(this_device), non_blocking=True),
             ToTorchImage(),
             NormalizeImage(IMAGENET_MEAN, IMAGENET_STD, np.float16)
         ]
@@ -71,7 +70,7 @@ class FfcvImagenet(pl.LightningDataModule):
                             'image': image_pipeline,
                             'label': label_pipeline
                         },
-                        distributed=False)
+                        distributed=True)
 
         return loader
 

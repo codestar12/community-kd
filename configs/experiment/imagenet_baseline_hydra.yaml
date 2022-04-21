@@ -7,7 +7,7 @@ defaults:
   - override /mode: exp.yaml
   - override /trainer: default.yaml
   - override /model: hydra_com_baseline.yaml
-  - override /datamodule: ffcv_imagenet.yaml
+  - override /datamodule: imagenet_torch.yaml
   - override /callbacks: default.yaml
   - override /logger: wandb.yaml
   - override /callbacks: default.yaml
@@ -44,19 +44,18 @@ trainer:
   precision: 16
   accelerator: gpu
   # strategy: ddp
-  # strategy:
-  #   _target_: pytorch_lightning.strategies.DDPStrategy
-  #   find_unused_parameters: False
-  # devices:
+  strategy:
+    _target_: pytorch_lightning.strategies.DDPStrategy
+    find_unused_parameters: False
+  devices: -1
   #   - 0
     # - 2
     # - 3
 
 datamodule:
-  batch_size: 768
-  workers: 0
-  pin_memory: False
-  in_memory: True
+  batch_size: 512
+  workers: 5
+  pin_memory: True
   train_size: 160
   test_size: 224
 
@@ -66,6 +65,7 @@ model:
   lr: 0.008
   weight_decay: 0.02
   warmup: 5
+  hard_label_end: 0.2
 
 callbacks:
   early_stopping:
