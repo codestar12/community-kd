@@ -1,0 +1,57 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=example_simple.yaml
+
+defaults:
+  - override /mode: exp.yaml
+  - override /trainer: default.yaml
+  - override /model: resnet50_timm.yaml
+  - override /datamodule: imagenette_datamodule.yaml
+  - override /callbacks: default.yaml
+  - override /logger: wandb.yaml
+
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+
+# name of the run determines folder name in logs
+# it's also accessed by loggers
+name: "timm_res"
+
+seed: 12345
+
+trainer:
+  min_epochs: 1
+  max_epochs: 200
+  #precision: 16
+  accelerator: gpu
+  #strategy: ddp
+  strategy:
+    _target_: pytorch_lightning.strategies.DDPStrategy
+    find_unused_parameters: False
+  devices:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+
+model:
+  model: 'resnet50'
+  num_classes: 10
+
+datamodule:
+  num_workers: 8
+  batch_size: 256
+  train_size: 224
+  test_size: 312
+
+logger:
+  wandb:
+    project: "resize-prune"
+    name: "baseline_four_gpus_FP16"
+
+

@@ -50,26 +50,295 @@
 # python run.py experiment=one_student_codistill.yaml model.periods=2 model.student_layers="[[1,1]]" name=one_student_codistill_t2_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
 # python run.py experiment=one_student_codistill.yaml model.periods=2 model.student_layers="[[1,1]]" name=one_student_codistill_t2_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
 
-python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.2 model.student_layers="[[1,1]]" name=one_student_codistill_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
-python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.2 model.student_layers="[[1,1]]" name=one_student_codistill_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
+# python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.2 model.student_layers="[[1,1]]" name=one_student_codistill_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
+# python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.2 model.student_layers="[[1,1]]" name=one_student_codistill_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
 
-python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.3 model.student_layers="[[1,1]]" name=one_student_codistill_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
-python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.3 model.student_layers="[[1,1]]" name=one_student_codistill_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
+# python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.3 model.student_layers="[[1,1]]" name=one_student_codistill_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
+# python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.3 model.student_layers="[[1,1]]" name=one_student_codistill_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
 
-python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.4 model.student_layers="[[1,1]]" name=one_student_codistill_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
-python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.4 model.student_layers="[[1,1]]" name=one_student_codistill_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
+# python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.4 model.student_layers="[[1,1]]" name=one_student_codistill_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
+# python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.4 model.student_layers="[[1,1]]" name=one_student_codistill_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
 
-python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.5 model.student_layers="[[1,1]]" name=one_student_codistill_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
-python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.5 model.student_layers="[[1,1]]" name=one_student_codistill_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
+# python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.5 model.student_layers="[[1,1]]" name=one_student_codistill_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
+# python run.py experiment=one_student_codistill.yaml model.hard_label_end=0.5 model.student_layers="[[1,1]]" name=one_student_codistill_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
 
-python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.2 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
-python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.2 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
+# python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.2 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
+# python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.2 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
 
-python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.3 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
-python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.3 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
+# python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.3 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
+# python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.3 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
 
-python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.4 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
-python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.4 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
+# python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.4 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
+# python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.4 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
 
-python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.5 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
-python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.5 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
+# python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.5 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_42_11 logger.wandb.project="hydra_half_community" seed=42
+# python run.py experiment=two_student_all2all.yaml model.hard_label_end=0.5 model.num_students=2 model.student_layers="[[1,1], [1,1]]" name=two_student_all2all_seed_12345_11 logger.wandb.project="hydra_half_community" seed=12345
+
+# python run.py experiment=resnet_imagenette_prune.yaml \
+#     callbacks.pruning.amount.final_sparsity=0.5 \
+#     callbacks.pruning.amount.starting_epoch=99 \
+#     callbacks.pruning.amount.ending_epoch=149 \
+#     callbacks.pruning.amount.freq=10 \
+#     logger.wandb.name="prune_eight_gpus_0.5"
+
+# python run.py experiment=resnet_imagenette_resize_prune.yaml \
+#     callbacks.pruning.amount.final_sparsity=0.3 \
+#     callbacks.pruning.amount.starting_epoch=99 \
+#     callbacks.pruning.amount.ending_epoch=149 \
+#     callbacks.pruning.amount.freq=10 \
+#     logger.wandb.name="resize_prune_eight_gpus_0.3"
+
+python run.py experiment=resnet_imagenette_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.3 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=42 \
+    logger.wandb.name="prune_eight_gpus_0.3"
+
+python run.py experiment=resnet_imagenette_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.3 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=35 \
+    logger.wandb.name="prune_eight_gpus_0.3"
+
+python run.py experiment=resnet_imagenette_resize_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.3 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=42 \
+    logger.wandb.name="resize_prune_eight_gpus_0.3"
+
+
+python run.py experiment=resnet_imagenette_resize_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.3 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=35 \
+    logger.wandb.name="resize_prune_eight_gpus_0.3"
+
+python run.py experiment=resnet_imagenette_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.35 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=1234 \
+    logger.wandb.name="prune_eight_gpus_0.35"
+
+python run.py experiment=resnet_imagenette_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.35 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=42 \
+    logger.wandb.name="prune_eight_gpus_0.35"
+
+python run.py experiment=resnet_imagenette_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.35 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=35 \
+    logger.wandb.name="prune_eight_gpus_0.35"
+
+python run.py experiment=resnet_imagenette_resize_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.35 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=1234 \
+    logger.wandb.name="resize_prune_eight_gpus_0.35"
+
+python run.py experiment=resnet_imagenette_resize_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.35 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=35 \
+    logger.wandb.name="resize_prune_eight_gpus_0.35"
+
+python run.py experiment=resnet_imagenette_resize_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.35 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=42 \
+    logger.wandb.name="resize_prune_eight_gpus_0.35"
+
+
+python run.py experiment=resnet_imagenette_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.4 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=42 \
+    logger.wandb.name="prune_eight_gpus_0.4"
+
+python run.py experiment=resnet_imagenette_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.4 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=35 \
+    logger.wandb.name="prune_eight_gpus_0.4"
+
+python run.py experiment=resnet_imagenette_resize_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.4 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=42 \
+    logger.wandb.name="resize_prune_eight_gpus_0.4"
+
+python run.py experiment=resnet_imagenette_resize_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.4 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=35 \
+    logger.wandb.name="resize_prune_eight_gpus_0.4"
+
+python run.py experiment=resnet_imagenette_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.5 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=42 \
+    logger.wandb.name="prune_eight_gpus_0.5"
+
+python run.py experiment=resnet_imagenette_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.5 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=35 \
+    logger.wandb.name="prune_eight_gpus_0.5"
+
+python run.py experiment=resnet_imagenette_resize_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.5 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=42 \
+    logger.wandb.name="resize_prune_eight_gpus_0.5"
+
+python run.py experiment=resnet_imagenette_resize_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.5 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=35 \
+    logger.wandb.name="resize_prune_eight_gpus_0.5"
+
+python run.py experiment=resnet_imagenette_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.6 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=42 \
+    logger.wandb.name="prune_eight_gpus_0.6"
+
+python run.py experiment=resnet_imagenette_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.6 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=35 \
+    logger.wandb.name="prune_eight_gpus_0.6"
+
+python run.py experiment=resnet_imagenette_resize_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.6 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=42 \
+    logger.wandb.name="resize_prune_eight_gpus_0.6"
+
+python run.py experiment=resnet_imagenette_resize_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.6 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=35 \
+    logger.wandb.name="resize_prune_eight_gpus_0.6"
+
+python run.py experiment=resnet_imagenette_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.7 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=42 \
+    logger.wandb.name="prune_eight_gpus_0.7"
+
+python run.py experiment=resnet_imagenette_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.7 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=35 \
+    logger.wandb.name="prune_eight_gpus_0.7"
+
+python run.py experiment=resnet_imagenette_resize_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.7 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=42 \
+    logger.wandb.name="resize_prune_eight_gpus_0.7"
+
+python run.py experiment=resnet_imagenette_resize_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.7 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=35 \
+    logger.wandb.name="resize_prune_eight_gpus_0.7"
+
+
+python run.py experiment=resnet_imagenette_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.8 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=42 \
+    logger.wandb.name="prune_eight_gpus_0.8"
+
+python run.py experiment=resnet_imagenette_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.8 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=35 \
+    logger.wandb.name="prune_eight_gpus_0.8"
+
+python run.py experiment=resnet_imagenette_resize_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.8 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=42 \
+    logger.wandb.name="resize_prune_eight_gpus_0.8"
+
+python run.py experiment=resnet_imagenette_resize_prune.yaml \
+    callbacks.pruning.amount.final_sparsity=0.8 \
+    callbacks.pruning.amount.starting_epoch=99 \
+    callbacks.pruning.amount.ending_epoch=149 \
+    callbacks.pruning.amount.freq=10 \
+    seed=35 \
+    logger.wandb.name="resize_prune_eight_gpus_0.8"
+
+
+
+
+
+
+
+
+
+
+
+

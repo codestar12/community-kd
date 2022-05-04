@@ -83,7 +83,7 @@ def print_config(
         "seed",
         "name",
     ),
-    resolve: bool = True,
+    resolve: bool = False,
 ) -> None:
     """Prints content of DictConfig using Rich library and its tree structure.
 
@@ -103,7 +103,7 @@ def print_config(
         config_section = config.get(field)
         branch_content = str(config_section)
         if isinstance(config_section, DictConfig):
-            branch_content = OmegaConf.to_yaml(config_section, resolve=resolve)
+            branch_content = OmegaConf.to_yaml(config_section, resolve=False)
 
         branch.add(rich.syntax.Syntax(branch_content, "yaml"))
 
