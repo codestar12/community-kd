@@ -1,0 +1,90 @@
+# @package _global_
+
+# to execute this experiment run:
+# python run.py experiment=example_simple.yaml
+
+defaults:
+  - override /mode: exp.yaml
+  - override /trainer: default.yaml
+  - override /model: timm_com_baseline.yaml
+  - override /datamodule: imagenette_datamodule.yaml
+  - override /callbacks: default.yaml
+  - override /logger: wandb.yaml
+  - override /callbacks: default.yaml
+
+# all parameters below will be merged with parameters from default configurations set above
+# this allows you to overwrite only specified parameters
+
+# name of the run determines folder name in logs
+# it's also accessed by loggers
+name: "hydra_res"
+
+seed: 12345
+
+trainer:
+  # uncomment for very fast testing batches
+  # limit_train_batches: 0.1
+  # limit_val_batches: 0.1
+  min_epochs: 1
+  max_epochs: 200
+  # when using webdataset this needs to be provided manually
+  # should be floor(dataset size / batch size / num gpus) + 1
+  # thats close enough for government work
+  # total train batchs at 128 10009.1171875
+  # total test batches at 128 390.625
+  # 3 gpus batchsize 128
+  # limit_train_batches:  3337
+  # limit_val_batches: 131
+  # 2 gpus batchsize 128
+  # limit_train_batches:  5005
+  # limit_val_batches: 196
+  # 1 gpus batchsize 128
+  # limit_train_batches: 10010
+  # limit_val_batches: 391
+  precision: 16
+  accelerator: gpu
+  strategy:
+    _target_: pytorch_lightning.strategies.DDPStrategy
+    find_unused_parameters: False
+  devices:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+
+datamodule:
+  batch_size: 256
+  train_size: 160
+  test_size: 224
+  num_workers: 4
+  pin_memory: False
+
+model:
+  num_classes: 10
+  lr_milestones: [100, 180]
+  lr: 0.01
+  warmup: 5
+  warmup_lr: 0.001
+  teacher_model: "resnet34d"
+
+callbacks:
+  early_stopping:
+    monitor: "teacher/val/acc"
+    patience: 100
+
+  model_checkpoint:
+    monitor: "teacher/val/acc"
+
+  # progressive_resize:
+  #   _target_: src.callbacks.progressive_resize.ProgressiveResize
+  #   rescale_factors: [0.25, 0.75, 1.00]
+  #   rescale_schedule: [0, 5, 10]
+
+logger:
+  wandb:
+    log_model: False
+    name: "Baseline_resnet34D"

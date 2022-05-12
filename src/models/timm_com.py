@@ -10,8 +10,8 @@ import torch.nn as nn
 
 from pytorch_lightning import LightningModule
 from torchmetrics.classification.accuracy import Accuracy
-from pl_bolts.optimizers.lr_scheduler import LinearWarmupCosineAnnealingLR
-
+from timm.scheduler.cosine_lr import CosineLRScheduler
+from torch_optimizer import Lamb
 
 from .modules.kd_loss import DistillKL
 
@@ -51,12 +51,15 @@ class CommKD(LightningModule):
         lr: float = 0.001,
         weight_decay: float = 0.0005,
         num_classes: int = 1000,
+        warmup: int = 5,
+        warmup_lr: float = 1e-5,
         lr_milestones: List[int] = [50, 80],
     ) -> None:
 
         super().__init__()
         self.num_students: int = num_students
         self.num_classes = num_classes
+        self.warmup = warmup
 
         if isinstance(student_model, str):
             __community = [
@@ -319,11 +322,17 @@ class CommKD(LightningModule):
             weight_decay=self.hparams.weight_decay,
         )
 
-        sched = torch.optim.lr_scheduler.MultiStepLR(
-            optimizer=optimizer, milestones=self.hparams.lr_milestones
+        sched = CosineLRScheduler(
+            optimizer=optimizer,
+            t_initial=self.trainer.max_epochs,
+            warmup_t=self.warmup,
+            warmup_lr_init=1e-5,
         )
 
         return {
             "optimizer": optimizer,
             "lr_scheduler": {"scheduler": sched, "monitor": "teacher/val/acc"},
         }
+
+    def lr_scheduler_step(self, scheduler, optimizer_idx: int, metric) -> None:
+        return scheduler.step(epoch=self.current_epoch)

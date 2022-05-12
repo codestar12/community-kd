@@ -73,3 +73,6 @@ class ImagenetteModule(pl.LightningDataModule):
 
     def val_dataloader(self):
         return self.make_loader(mode="val")
+
+    def test_dataloader(self):
+        return self.make_loader(mode="val")
