@@ -6,7 +6,7 @@
 defaults:
   - override /mode: exp.yaml
   - override /trainer: default.yaml
-  - override /model: resnet50_timm.yaml
+  - override /model: resnet50_kd.yaml
   - override /datamodule: imagenette_datamodule.yaml
   - override /callbacks: default.yaml
   - override /logger: wandb.yaml
@@ -28,7 +28,7 @@ trainer:
   #strategy: ddp
   strategy:
     _target_: pytorch_lightning.strategies.DDPStrategy
-    find_unused_parameters: False
+    find_unused_parameters: True
   devices:
     - 0
     - 1
@@ -40,7 +40,11 @@ trainer:
     - 7
 
 model:
-  model: 'resnet34'
+  teacher_model: 'resnet34'
+  teacher_checkpoint: '/home/cjb92/community-kd/logs/experiments/timm_res/runs/2022-05-12/18-38-29/checkpoints/epoch_199.ckpt'
+  student_model: 'resnet18'
+  hard_weight: 0.1
+  soft_weight: 0.9
   num_classes: 10
 
 datamodule:

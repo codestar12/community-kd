@@ -34,6 +34,7 @@ class ResNet(LightningModule):
         self.criterion = torch.nn.CrossEntropyLoss()
 
         self.train_acc = Accuracy()
+        self.test_acc = Accuracy()
         self.val_acc = Accuracy()
         
         prune_list = []
@@ -108,15 +109,15 @@ class ResNet(LightningModule):
 
         return {"loss": loss, "preds": preds, "targets": targets}
 
-    # def test_step(self, batch: Any, batch_idx: int):
-    #     loss, preds, targets = self.step(batch)
+    def test_step(self, batch: Any, batch_idx: int):
+        loss, preds, targets = self.step(batch)
 
-    #     # log test metrics
-    #     acc = self.test_acc(preds, targets)
-    #     self.log("test/loss", loss, on_step=False, on_epoch=True)
-    #     self.log("test/acc", acc, on_step=False, on_epoch=True)
+        # log test metrics
+        acc = self.test_acc(preds, targets)
+        self.log("test/loss", loss, on_step=False, on_epoch=True)
+        self.log("test/acc", acc, on_step=False, on_epoch=True)
 
-    #     return {"loss": loss, "preds": preds, "targets": targets}
+        return {"loss": loss, "preds": preds, "targets": targets}
 
     # def test_epoch_end(self, outputs: List[Any]):
     #     pass
