@@ -1,27 +1,30 @@
 from re import T
-from typing import Any, List, Tuple, Optional
+from typing import Any, List, Tuple
 
 import timm
 import torch
 from pytorch_lightning import LightningModule
 from torchmetrics import MaxMetric
 from torchmetrics.classification.accuracy import Accuracy
-from composer import functional as cf
+from .modules.kd_loss import DistillKL
+from collections import OrderedDict
 from timm.scheduler.cosine_lr import CosineLRScheduler
 from omegaconf import OmegaConf
-import torch_pruning as tp
+
 
 class ResNet(LightningModule):
 
     def __init__(
         self,
+        teacher_checkpoint: str,
         lr: float = 0.001,
         warmup: int = 5,
         weight_decay: float = 0.0005,
-        model: str = 'resnet34',
         num_classes: int = 1000,
-        in_place_prune: Optional[bool] = None,
-        in_place_prune_ratio: Optional[float] = None
+        teacher_model: str = 'resnet34',
+        student_model: str = 'resnet34',
+        hard_weight: float = 0.1,
+        soft_weight: float = 0.9,
     )->None:
 
         super().__init__()
@@ -30,18 +33,26 @@ class ResNet(LightningModule):
 
         self.num_classes = num_classes
         self.warmup = warmup
-        self.model = timm.create_model(model, num_classes=self.num_classes)
-        self.criterion = torch.nn.CrossEntropyLoss()
 
-        self.train_acc = Accuracy()
-        self.test_acc = Accuracy()
-        self.val_acc = Accuracy()
-        
+        self.teacher = timm.create_model(teacher_model, num_classes=self.num_classes)
+        checkpoint = torch.load(teacher_checkpoint)
+        corrected_state_dict = self.fix_checkpoint(checkpoint['state_dict'])
+        self.teacher.load_state_dict(corrected_state_dict)
+        self.teacher.eval()
+
+        self.student = timm.create_model(student_model, num_classes=self.num_classes)
+        self.student.load_state_dict(corrected_state_dict)
+
         prune_list = []
         for name, layer in self.named_modules():
-            if isinstance(layer, torch.nn.Conv2d):
-                if ('conv1' in name or "conv2" in name) and 'layer' in name:
-                    prune_list.append((layer, "weight"))
+            if student_model == 'resnet34':
+                if isinstance(layer, torch.nn.Conv2d):
+                    if ('conv1' in name) and 'layer' in name:
+                        prune_list.append((layer, "weight"))
+            else:
+                if isinstance(layer, torch.nn.Conv2d):
+                    if ('conv1' in name or "conv2" in name) and 'layer' in name:
+                        prune_list.append((layer, "weight"))
 
         self.prune_list = prune_list
 
@@ -52,38 +63,41 @@ class ResNet(LightningModule):
             use_cache=False
         )
 
-        if in_place_prune:
-            self.prune_model(self.model, self.prune_list, in_place_prune_ratio)
+        self.criterion = torch.nn.CrossEntropyLoss()
+        self.kl_loss = DistillKL()
+        self.hard_weight = hard_weight
+        self.soft_weight = soft_weight
 
-    def prune_model(self, model, prune_list, amount=0.2):
-        model.cpu()
-        DG = tp.DependencyGraph().build_dependency( model, torch.randn(1, 3, 224, 224) )
-        def prune_conv(conv, amount=0.2):
-        #weight = conv.weight.detach().cpu().numpy()
-        #out_channels = weight.shape[0]
-        #L1_norm = np.sum( np.abs(weight), axis=(1,2,3))
-        #num_pruned = int(out_channels * pruned_prob)
-        #pruning_index = np.argsort(L1_norm)[:num_pruned].tolist() # remove filters with small L1-Norm
-            strategy = tp.strategy.L1Strategy()
-            pruning_index = strategy(conv.weight, amount=amount, round_to=2)
-            plan = DG.get_pruning_plan(conv, tp.prune_conv, pruning_index)
-            plan.exec()
+        self.train_acc = Accuracy()
+        self.test_acc = Accuracy()
+        self.val_acc = Accuracy()
+
+    def fix_checkpoint(self, old_state_dict):
     
-        block_prune_probs = [0.1, 0.1, 0.2, 0.2, 0.2, 0.2, 0.3, 0.3]
-        blk_id = 0
-        for m, n in prune_list:
-            prune_conv(m,amount)
-        
-        return model    
+        new_state_dict = OrderedDict()
     
+        for key, value in old_state_dict.items():
+            new_state_dict[key.replace('model.', '')] = value
+
+        return new_state_dict
+
+
     def forward(self, x: torch.Tensor):
-        return self.model(x)
+
+        with torch.no_grad():
+            logits_t = self.teacher(x)
+
+        logits_s = self.student(x)
+
+        return logits_t, logits_s
 
     def step(self, batch: Any):
         x, y = batch
-        logits = self.forward(x)
-        loss = self.criterion(logits, y)
-        preds = torch.argmax(logits, dim=1)
+        logits_t, logits_s = self.forward(x)
+        hard_loss = self.criterion(logits_s, y)
+        soft_loss = self.kl_loss(logits_s, logits_t.detach())
+        preds = torch.argmax(logits_s, dim=1)
+        loss = self.soft_weight * soft_loss + self.hard_weight * hard_loss 
         return loss, preds, y
 
     def training_step(self, batch: Any, batch_idx: int):
@@ -98,6 +112,10 @@ class ResNet(LightningModule):
         # and then read it in some callback or in `training_epoch_end()`` below
         # remember to always return loss from `training_step()` or else backpropagation will fail!
         return {"loss": loss, "preds": preds, "targets": targets}
+
+    def training_epoch_end(self, outputs: List[Any]):
+        # `outputs` is a list of dicts returned from `training_step()`
+        pass
 
     def validation_step(self, batch: Any, batch_idx: int):
         loss, preds, targets = self.step(batch)
@@ -128,9 +146,6 @@ class ResNet(LightningModule):
         #self.test_acc.reset()
         self.val_acc.reset()
 
-        # if self.current_epoch in self.rescale_values:
-        #     self.current_scale = self.rescale_values[self.current_epoch]
-
     def configure_optimizers(self):
         """Choose what optimizers and learning-rate schedulers to use in your optimization.
         Normally you'd need one. But in the case of GANs or similar you might have multiple.
@@ -146,7 +161,7 @@ class ResNet(LightningModule):
             optimizer=optimizer,
             t_initial=self.trainer.max_epochs,
             warmup_t=self.warmup,
-            warmup_lr_init=1e-5
+            warmup_lr_init=1e-5,
         )
 
         return {

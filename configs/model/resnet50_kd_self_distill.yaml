@@ -1,0 +1,4 @@
+_target_: src.models.resnet50_self_distill.ResNet
+
+lr: 0.001
+weight_decay: 0.0005

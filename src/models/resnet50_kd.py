@@ -32,7 +32,7 @@ class ResNet(LightningModule):
 
         self.num_classes = num_classes
 
-        self.teacher = timm.create_model('resnet34', num_classes=self.num_classes)
+        self.teacher = timm.create_model(teacher_model, num_classes=self.num_classes)
         checkpoint = torch.load(teacher_checkpoint)
         corrected_state_dict = self.fix_checkpoint(checkpoint['state_dict'])
         self.teacher.load_state_dict(corrected_state_dict)

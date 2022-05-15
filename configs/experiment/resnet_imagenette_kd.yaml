@@ -40,8 +40,8 @@ trainer:
     - 7
 
 model:
-  teacher_model: 'resnet34'
-  teacher_checkpoint: '/home/cjb92/community-kd/logs/experiments/timm_res/runs/2022-05-12/18-38-29/checkpoints/epoch_199.ckpt'
+  teacher_model: 'resnet50'
+  teacher_checkpoint: "/home/cjb92/community-kd/logs/experiments/timm_res/runs/2022-05-14/18-20-55/checkpoints/epoch_188.ckpt"  #'/home/cjb92/community-kd/logs/experiments/timm_res/runs/2022-05-12/18-38-29/checkpoints/epoch_199.ckpt'
   student_model: 'resnet18'
   hard_weight: 0.1
   soft_weight: 0.9
@@ -50,8 +50,8 @@ model:
 datamodule:
   num_workers: 8
   batch_size: 128
-  train_size: 224
-  test_size: 312
+  train_size: 160
+  test_size: 224
 
 logger:
   wandb:

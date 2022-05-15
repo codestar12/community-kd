@@ -5,6 +5,8 @@ import pytorch_lightning as pl
 from torch.utils.data import ConcatDataset, DataLoader, Dataset, random_split
 from torchvision.transforms import transforms
 from torchvision.datasets import ImageFolder
+from timm.data.auto_augment import rand_augment_transform
+
 
 
 class ImagenetteModule(pl.LightningDataModule):
@@ -36,7 +38,11 @@ class ImagenetteModule(pl.LightningDataModule):
             return transforms.Compose(
                 [
                     transforms.RandomResizedCrop(self.train_size),
-                    transforms.RandomHorizontalFlip(),
+                    rand_augment_transform(
+                        config_str='rand-m9-mstd0.5', 
+                        hparams={'translate_const': 117, 'img_mean': (124, 116, 104)}
+                    ),
+                    #transforms.RandomHorizontalFlip(),
                     transforms.ToTensor(),
                     self.normalize,
                 ]
